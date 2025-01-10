@@ -43,9 +43,9 @@ RESET="\033[00m" # Normal
 SECONDS=0
 s=4                          # Slows scritpt down so you can see whats going on
 
-# verify running as root
-if [[ "${EUID}" -ne 0 ]]; then
-  echo -e ' '${RED}'[!]'${RESET}" This script must be ${RED}run as root${RESET}" 1>&2
+# verify running with sudo
+if [[ "${EUID}" -eq 0 ]]; then
+  echo -e ' '${RED}'[!]'${RESET}" This script should not be run as root directly. Use a non-root user with sudo privileges." 1>&2
   echo -e ' '${RED}'[!]'${RESET}" Quitting..." 1>&2
   exit 1
 fi
@@ -67,26 +67,26 @@ printf '\n============================================================\n'
 printf '   ⏳ Updating System\n' | tee -a script.log
 printf '============================================================\n\n'
 sleep $s
-apt update && apt upgrade -y && apt autoremove -y -qq >> script.log 2>>script_error.log    # what is -qq doing?
+sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y -qq >> script.log 2>>script_error.log
 }
 install_misc() {
 printf '\n============================================================\n'
 printf '    ⏳ Install Misc\n' | tee -a script.log
 printf '============================================================\n\n'
 sleep $s
-apt install wget -y >> script.log 2>>script_error.log
-apt install ruby -y >> script.log 2>>script_error.log
-apt install git -y >> script.log 2>>script_error.log
-apt install build-essential libcurl4-openssl-dev libxml2 libxml2-dev libxslt1-dev ruby-dev  libgmp-dev zlib1g-dev -y >> script.log 2>>script_error.log
-apt install nmap -y >> script.log 2>>script_error.log
-apt install whois -y >> script.log 2>>script_error.log
-apt install dnsutils -y >> script.log 2>>script_error.log              # dig & nslookup
-apt install tree -y >> script.log 2>>script_error.log
-apt install figlet toilet -y >> script.log 2>>script_error.log           # install figlet for banners
-apt install neofetch -y >> script.log 2>>script_error.log
-apt install btop -y >> script.log 2>>script_error.log
-apt install fzf -y >> script.log 2>>script_error.log
-apt install tldr -y >> script.log 2>>script_error.log
+sudo apt install wget -y >> script.log 2>>script_error.log
+sudo apt install ruby -y >> script.log 2>>script_error.log
+sudo apt install git -y >> script.log 2>>script_error.log
+sudo apt install build-essential libcurl4-openssl-dev libxml2 libxml2-dev libxslt1-dev ruby-dev  libgmp-dev zlib1g-dev -y >> script.log 2>>script_error.log
+sudo apt install nmap -y >> script.log 2>>script_error.log
+sudo apt install whois -y >> script.log 2>>script_error.log
+sudo apt install dnsutils -y >> script.log 2>>script_error.log
+sudo apt install tree -y >> script.log 2>>script_error.log
+sudo apt install figlet toilet -y >> script.log 2>>script_error.log
+sudo apt install neofetch -y >> script.log 2>>script_error.log
+sudo apt install btop -y >> script.log 2>>script_error.log
+sudo apt install fzf -y >> script.log 2>>script_error.log
+sudo apt install tldr -y >> script.log 2>>script_error.log
 }
 
 install_tmux() {
@@ -94,11 +94,7 @@ printf '\n============================================================\n'
 printf '   ⏳ Install tmux ref & custom config https://github.com/hamvocke/dotfiles/tree/master/tmux\n' | tee -a script.log
 printf '============================================================\n\n'
 sleep $s
-apt install tmux -y -q >> script.log 2>>script_error.log
-# wget https://raw.githubusercontent.com/hamvocke/dotfiles/master/tmux/.tmux.conf -> now install using STOW
-# wget https://raw.githubusercontent.com/hamvocke/dotfiles/master/tmux/tmux_colors.sh
-# chmod +x tmux_colors.sh
-# ./tmux_colors.sh
+sudo apt install tmux -y -q >> script.log 2>>script_error.log
 }
 
 install_digall() {
@@ -152,19 +148,19 @@ update_sources() {
 
     if [ ! -f /etc/apt/sources.list.bak ]; then
         # Backup the sources.list file and handle errors
-        cp /etc/apt/sources.list /etc/apt/sources.list.bak || {
+        sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak || {
             echo "Error: Failed to backup /etc/apt/sources.list" | tee -a script_error.log
             exit 1
         }
         # Update the sources.list file and handle errors
-        cat <<"EOF" > /etc/apt/sources.list || {
+        sudo bash -c 'cat <<"EOF" > /etc/apt/sources.list || {
             echo "Error: Failed to update /etc/apt/sources.list" | tee -a script_error.log
             exit 1
         }
 deb http://deb.debian.org/debian bookworm main
 deb http://deb.debian.org/debian bookworm-updates main
 deb http://deb.debian.org/debian-security bookworm-security main
-EOF
+EOF'
     fi
 }
 
@@ -232,13 +228,10 @@ printf '\n============================================================\n'
 printf '  ⏳ Install python & PIP. \n' | tee -a script.log
 printf '============================================================\n\n'
 sleep $s
-#     python3 seems ot be installed by default on debian but not pip3 it seems!!
-# apt-get install python3.11.2
-#     get error ==> "error: externally-managed-environment" when try & install pip. rectify with:-
 cd /usr/lib/python3.11
-rm EXTERNALLY-MANAGED
+sudo rm EXTERNALLY-MANAGED
 cd ~
-apt install python3-pip -y -q >> script.log 2>>script_error.log
+sudo apt install python3-pip -y -q >> script.log 2>>script_error.log
 }
 
 install_docker() {
@@ -248,23 +241,23 @@ print '[+] link --> https://docs.docker.com/engine/install/debian/#install-using
 printf '============================================================\n\n'
 sleep $s
 # Add Docker's official GPG key:
-apt-get update
-apt-get install ca-certificates curl gnupg
-install -m 0755 -d /etc/apt/keyrings
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-chmod a+r /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
 # Add the repository to Apt sources:
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt-get update
+sudo apt-get update
 # install docker package
-apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 printf '\n\n'
 printf '**********\n'
 printf 'Verify that the installation is successful by running the hello-world image:'
-docker run hello-world
+sudo docker run hello-world
 printf '**********\n'
 printf '\n\n'
 sleep 5
@@ -429,52 +422,36 @@ compute_finish_time() {
 }
 main() {
     compute_start_time
-    update_sources	# foud that the "profitserver" vps was not running bookworm --> this upgrade sources file    
+    update_sources
     system_update
     install_misc
     install_tmux
     add_to_bashrc
     install_nano
     install_python
-#    install_docker
     install_golang
-#   install_PD_subfinder
-#   install_hakoriginfiinder
-#    install_WPScan
-#   install_proxychains     # need attantion do not use
     install_nse_scripts
-    install_lsd            # ls delux
-#    install_DO_Metrics_Agent  # could be a problem with this
+    install_lsd
     setup_synlincs
     clone_repos
-#   setup_stow    # not used - not working
-#   install_digall # need to make sure its put in /mycode
+    compute_finish_time
+}
 
 wsl() {
     compute_start_time
-    update_sources	# foud that the "profitserver" vps was not running bookworm --> this upgrade sources file    
+    update_sources
     system_update
     install_misc
     install_tmux
     add_to_bashrc
     install_nano
     install_python
-#    install_docker
     install_golang
-#   install_PD_subfinder
-#   install_hakoriginfiinder
-#    install_WPScan
-#   install_proxychains     # need attantion do not use
     install_nse_scripts
-    install_lsd            # ls delux
-#    install_DO_Metrics_Agent  # could be a problem with this
+    install_lsd
     setup_synlincs
     clone_repos
-#   setup_stow    # not used - not working
-#   install_digall # need to make sure its put in /mycode
-
-
- compute_finish_time
+    compute_finish_time
 }
 
 # Use trap to handle unexpected errors and perform cleanup
@@ -491,7 +468,7 @@ echo "  ✅ THE END OF THE SCRIPT"
 sleep ${s}
 
 ELAPSED="Elapsed: $(($SECONDS / 3600))hrs $((($SECONDS / 60) % 60))min $(($SECONDS % 60))sec"
-    printf "\n${CYAN}Finished - Runtime = ${ELAPSED}${NORMAL}\n"
+printf "\n${CYAN}Finished - Runtime = ${ELAPSED}${NORMAL}\n"
 
 # What to do now
 # run ~/mycode/repo/My_Random_scripts/decrypt,sh, entering the password
