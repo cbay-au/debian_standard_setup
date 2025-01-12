@@ -1,10 +1,11 @@
-
 # DigitalOcean Droplet Setup Script
 
 This repository contains a Bash script designed to automate the setup of a Debian-based server, particularly useful for setting up a DigitalOcean droplet. The script installs various utilities and configures the system for development and operational tasks.
 
 ## Features
 
+- Interactive menu system for selecting components to install
+- Automatic privilege escalation handling for non-root users
 - System updates and upgrades
 - Installation of essential packages and tools
 - Configuration of `.bashrc` and other shell settings
@@ -14,7 +15,7 @@ This repository contains a Bash script designed to automate the setup of a Debia
 ## Prerequisites
 
 - A Debian-based server (e.g., a DigitalOcean droplet)
-- Root access to the server
+- Either root access or a user with sudo privileges
 - `curl` installed on the server
 
 ## Usage
@@ -28,7 +29,6 @@ To run only the `wsl` function options, use:
 ## Script Functions
 
 - **`main`**: The default function that runs the full setup process.
-- **`wsl`**: A specialized function for setting up a Windows Subsystem for Linux (WSL) environment.
 
 ## Error Handling
 

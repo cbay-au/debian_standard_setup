@@ -20,13 +20,9 @@
 
 #       -s --> True if file exists and has a size greater than zero.
 
-# Revison Log
-# Main-4
-#  
-# Main-3
-#  added LSDeluxe
-#  added function to update_sources so as installed bookworm
-#  updated .nanorc to include some defaults
+
+
+# 
 
 # Used for debugging
 #set -x
@@ -355,7 +351,15 @@ printf '\n============================================================\n'
 printf ' ⏳  Install Fabric Ref:- https://github.com/danielmiessler/fabric \n' | tee -a script.log
 printf '============================================================\n\n'
 sleep $s
-apt install lsd
+go install github.com/danielmiessler/fabric@latest
+# Golang environment variables
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+
+# Update PATH to include GOPATH and GOROOT binaries
+export PATH=$GOPATH/bin:$GOROOT/bin:$HOME/.local/bin:$PATH
+
+
 }
 
 
@@ -454,54 +458,157 @@ compute_finish_time() {
     echo -e "  ⌛ Time (roughly) taken: ${YELLOW}$(( $(( finish_time - start_time ))  )) seconds${RESET}"
     echo "\n\n Install completed - $finish_time \n" >> script.log
 }
+
+create_menu() {
+    # Initialize arrays for menu options
+    local options=()
+    local selected=()
+    
+    # Define menu options (add all your installable components here)
+    options=(
+        "System Update" 
+        "Miscellaneous Utilities" 
+        "Tmux" 
+        "Bash Configuration" 
+        "Nano Editor" 
+        "Python" 
+        "Docker" 
+        "Golang" 
+        "Project Discovery Subfinder" 
+        "Hakoriginfinder" 
+        "WPScan" 
+        "NSE Scripts" 
+        "LSDeluxe" 
+        "DO Metrics Agent" 
+        "Symlinks Setup" 
+        "Clone Repositories"
+        "Fabric"
+    )
+    
+    # Initialize all options as unselected (0)
+    for i in "${!options[@]}"; do
+        selected[$i]=0
+    done
+
+    while true; do
+        clear
+        echo -e "${BLUE}=== Installation Options ===${RESET}"
+        echo "Use space to toggle selection, Enter to confirm"
+        echo ""
+        
+        # Display menu
+        for i in "${!options[@]}"; do
+            if [ "${selected[$i]}" == "1" ]; then
+                echo -e "[${GREEN}✓${RESET}] $((i+1)). ${options[$i]}"
+            else
+                echo -e "[ ] $((i+1)). ${options[$i]}"
+            fi
+        done
+        
+        # Get user input
+        read -n 1 -s key
+        
+        case "$key" in
+            # Enter key
+            "")
+                return 0
+                ;;
+            # Space key
+            " ")
+                read -n 1 -s num
+                if [[ "$num" =~ ^[0-9]+$ ]]; then
+                    index=$((num-1))
+                    if [ "$index" -lt "${#options[@]}" ]; then
+                        if [ "${selected[$index]}" == "1" ]; then
+                            selected[$index]=0
+                        else
+                            selected[$index]=1
+                        fi
+                    fi
+                fi
+                ;;
+        esac
+    done
+}
+
+# Modify the main() function to use the menu
 main() {
     compute_start_time
-    update_sources	# foud that the "profitserver" vps was not running bookworm --> this upgrade sources file    
-    system_update
-    install_misc
-    install_tmux
-    add_to_bashrc
-    install_nano
-    install_python
-#    install_docker
-    install_golang
-#   install_PD_subfinder
-#   install_hakoriginfiinder
-#    install_WPScan
-#   install_proxychains     # need attantion do not use
-    install_nse_scripts
-    install_lsd            # ls delux
-#    install_DO_Metrics_Agent  # could be a problem with this
-    setup_synlincs
-    clone_repos
-#   setup_stow    # not used - not working
-#   install_digall # need to make sure its put in /mycode
-
-wsl() {
-    compute_start_time
-    update_sources	# foud that the "profitserver" vps was not running bookworm --> this upgrade sources file    
-    system_update
-    install_misc
-    install_tmux
-    add_to_bashrc
-    install_nano
-    install_python
-#    install_docker
-    install_golang
-#   install_PD_subfinder
-#   install_hakoriginfiinder
-#    install_WPScan
-#   install_proxychains     # need attantion do not use
-    install_nse_scripts
-    install_lsd            # ls delux
-#    install_DO_Metrics_Agent  # could be a problem with this
-    setup_synlincs
-    clone_repos
-#   setup_stow    # not used - not working
-#   install_digall # need to make sure its put in /mycode
-
-
- compute_finish_time
+    
+    # Show menu and get user selections
+    create_menu
+    
+    # Install selected components based on menu choices
+    if [ "${selected[0]}" == "1" ]; then
+        update_sources
+        system_update
+    fi
+    
+    if [ "${selected[1]}" == "1" ]; then
+        install_misc
+    fi
+    
+    if [ "${selected[2]}" == "1" ]; then
+        install_tmux
+    fi
+    
+    if [ "${selected[3]}" == "1" ]; then
+        add_to_bashrc
+    fi
+    
+    if [ "${selected[4]}" == "1" ]; then
+        install_nano
+    fi
+    
+    if [ "${selected[5]}" == "1" ]; then
+        install_python
+    fi
+    
+    if [ "${selected[6]}" == "1" ]; then
+        install_docker
+    fi
+    
+    if [ "${selected[7]}" == "1" ]; then
+        install_golang
+    fi
+    
+    if [ "${selected[8]}" == "1" ]; then
+        install_PD_subfinder
+    fi
+    
+    if [ "${selected[9]}" == "1" ]; then
+        install_hakoriginfiinder
+    fi
+    
+    if [ "${selected[10]}" == "1" ]; then
+        install_WPScan
+    fi
+    
+    if [ "${selected[11]}" == "1" ]; then
+        install_nse_scripts
+    fi
+    
+    if [ "${selected[12]}" == "1" ]; then
+        install_lsd
+    fi
+    
+    if [ "${selected[13]}" == "1" ]; then
+        install_DO_Metrics_Agent
+    fi
+    
+    if [ "${selected[14]}" == "1" ]; then
+        setup_synlincs
+    fi
+    
+    if [ "${selected[15]}" == "1" ]; then
+        clone_repos
+    fi
+    
+    if [ "${selected[16]}" == "1" ]; then
+        install_fabric
+    fi
+    
+    compute_finish_time
 }
 
 # Use trap to handle unexpected errors and perform cleanup
