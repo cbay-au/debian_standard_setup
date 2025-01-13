@@ -1,4 +1,4 @@
-#!/bin/bash
+##!/bin/bash
 # icons
 # ❌⏳💀🎉 ℹ️ ⚠️ 🚀 ✅ ♻ 🚮 🛡 🔧  ⚙ 
 
@@ -59,7 +59,7 @@ while true; do
 done 2>/dev/null &
 
 # Download and run the main script with sudo
-sudo bash -c "$(curl -k -s https://raw.githubusercontent.com/leighton-0/DigitalOcean_Droplet_Setup/main/main_4)"
+sudo bash -c "$(curl -k -s https://raw.githubusercontent.com/cbay-au/debian_standard_setup/refs/heads/non-root/Main_0)"
 EOF
     chmod +x "$temp_script"
     exec "$temp_script"
