@@ -615,11 +615,11 @@ main() {
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
 
 # Check for arguments and call the appropriate function
-if [[ "$1" == "wsl" ]]; then
+#if [[ "$1" == "wsl" ]]; then
     wsl
-else
+#else
     main
-fi
+#fi
 
 echo "  ✅ THE END OF THE SCRIPT"
 sleep ${s}
