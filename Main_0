@@ -404,7 +404,7 @@ git remote set-url origin git@github.com:leighton-0/cheat_sheets
 cd ~/mycode/repos/DigitalOcean_Droplet_Setup
 git remote set-url origin git@github.com:leighton-0/DigitalOcean_Droplet_Setup
 git config --global user.name "Leighton"
-git config --global user.email leighton@clucas.au
+git config --global user.email gracetown@protonmail.com
 # Note  Need ot set up ssh keys for github ********************************
 cd ~
 mkdir zresults ztargets
